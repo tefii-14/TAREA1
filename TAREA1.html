@@ -1,0 +1,93 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor de Imágenes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        #visor {
+            width: 400px;
+            height: 400px;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: #fff;
+        }
+        .miniaturas {
+            display: flex;
+            margin-top: 10px;
+        }
+        .miniatura {
+            width: 60px;
+            height: 60px;
+            margin: 5px;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+        .info {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .barra {
+            height: 20px;
+            width: 100%;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .barra .progreso {
+            height: 100%;
+            background: #4caf50;
+            width: 0;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="visor"></div>
+    <div class="info">
+        <p><strong>Imagen:</strong> <span id="descripcion">Selecciona una imagen</span></p>
+        <p><strong>Confianza:</strong> <span id="confianza">0%</span></p>
+        <div class="barra"><div id="barra-progreso" class="progreso"></div></div>
+    </div>
+    <div class="miniaturas">
+        <div class="miniatura" style="background-image: url('images/animal-01.jpg');" onclick="cambiarImagen('images/animal-01.jpg', 'Cocodrilo: Un reptil semiacuático con una mordida poderosa.', 70)"></div>
+        <div class="miniatura" style="background-image: url('images/animal-02.jpg');" onclick="cambiarImagen('images/animal-02.jpg', 'Koala: Un marsupial que se alimenta de eucalipto.', 85)"></div>
+        <div class="miniatura" style="background-image: url('images/animal-03.jpg');" onclick="cambiarImagen('images/animal-03.jpg', 'Panda: Un oso icónico de China, amante del bambú.', 60)"></div>
+    </div>
+
+    <script>
+        function cambiarImagen(url, descripcion, confianza) {
+            let visor = document.getElementById('visor');
+            let img = new Image();
+            img.src = url;
+            img.onload = function () {
+                visor.style.backgroundImage = `url(${url})`;
+                document.getElementById('descripcion').innerText = descripcion;
+                document.getElementById('confianza').innerText = confianza + '%';
+                document.getElementById('barra-progreso').style.width = confianza + '%';
+            };
+            img.onerror = function () {
+                console.error("Error: No se pudo cargar la imagen " + url);
+                alert("No se encontró la imagen " + url);
+            };
+        }
+    </script>
+</body>
+</html>

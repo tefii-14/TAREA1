@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clasificación de Objetos</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Librerías necesarias -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ml5@0.12/dist/ml5.min.js"></script>
+
+  <style>
+    body {
+      text-align: center;
+      padding: 20px;
+    }
+    #video-holder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 class="my-3">Clasificación de Objetos</h2>
+    
+    <div id="video-holder" class="d-flex justify-content-center">
+      <!-- Aquí se coloca el video -->
+    </div>
+    
+    <div id="results" class="mt-4"></div>
+  </div>
+
+  <script>
+    let classifier;
+    let video;
+    let imageModelURL = './model/';
+
+    function preload() {
+      classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+    }
+
+    function setup() {
+      let canvas = createCanvas(480, 360);
+      canvas.parent("video-holder");
+
+      video = createCapture(VIDEO);
+      video.size(480, 360);
+      video.hide();
+
+      classifyVideo();
+    }
+
+    function draw() {
+      background(0);
+      image(video, 0, 0);
+    }
+
+    function classifyVideo() {
+      classifier.classify(video, gotResult);
+    }
+
+    function gotResult(error, results) {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      
+      displayResults(results);
+      classifyVideo();
+    }
+
+    function displayResults(results) {
+      let resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "<h3>Salida</h3>";
+
+      results.forEach(result => {
+        let confidencePercentage = Math.round(result.confidence * 100);
+
+        let progressBar = document.createElement("div");
+        progressBar.className = "progress my-2";
+        progressBar.style.height = "25px";
+
+        let bar = document.createElement("div");
+        bar.className = "progress-bar";
+        bar.style.width = confidencePercentage + "%";
+        bar.textContent = result.label + " " + confidencePercentage + "%";
+
+        progressBar.appendChild(bar);
+        resultsDiv.appendChild(progressBar);
+      });
+    }
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
