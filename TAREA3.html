@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detección de Manos</title>
+     <!--  cdn para gestion de objetos -->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+
+     <!-- CDN para ML -->
+     <script src="https://cdn.jsdelivr.net/npm/ml5@0.12/dist/ml5.min.js"></script>
+    <style>
+        body {
+            background: black;
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid white;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h2 id="status">Loading...</h2>
+
+    <script>
+        let handPose;
+        let video;
+        let hands = [];
+
+        function setup() {
+            let canvas = createCanvas(640, 480);
+            canvas.position((windowWidth - width) / 2, 100); // Centra el canvas
+            video = createCapture(VIDEO);
+            video.size(640, 480);
+            video.hide(); // Oculta el video HTML, pero sigue funcionando en P5.js
+
+            handPose = ml5.handpose(video, modelReady);
+            handPose.on("predict", (results) => {
+                hands = results;
+            });
+        }
+
+        function modelReady() {
+            document.getElementById("status").innerText = "Modelo cargado";
+            console.log("Modelo HandPose cargado");
+        }
+
+        function draw() {
+            background(0);
+            image(video, 0, 0, width, height);
+
+            if (hands.length > 0) {
+                let hand = hands[0]; // Primera mano detectada
+                let fingerTip = hand.annotations.indexFinger[3]; // Punta del dedo índice
+                let thumbTip = hand.annotations.thumb[3]; // Punta del pulgar
+                
+                let pinch = dist(fingerTip[0], fingerTip[1], thumbTip[0], thumbTip[1]);
+
+                // Color según el tamaño del círculo
+                let color;
+                if (pinch < 40) {
+                    color = "red"; // Pequeño
+                } else if (pinch < 80) {
+                    color = "orange"; // Mediano
+                } else {
+                    color = "yellow"; // Grande
+                }
+
+                fill(color);
+                noStroke();
+                circle(fingerTip[0], fingerTip[1], pinch);
+            }
+        }
+    </script>
+</body>
+</html>
